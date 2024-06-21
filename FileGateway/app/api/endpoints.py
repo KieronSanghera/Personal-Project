@@ -9,8 +9,6 @@ from app.schemas.schemas import (
 import requests
 from requests import Response as APIResponse
 import logging
-from uuid import uuid4
-
 
 router = APIRouter()
 
@@ -23,30 +21,50 @@ async def root():
 @router.post("/upload")
 async def file_upload(request: Request, file: UploadFile) -> Response:
     log: CommonEventFormat = CommonEventFormat(version="0.1.0")
-    log_info = {}
     connection_info: ConnectionInformation = connection_service.connection_info(
         request=request
     )
     file_info: FileInformation = file_service.get_metadata(file=file)
-    
-    log_info["src"] = connection_info.source_addr
 
-    store_file: APIResponse = requests.post(
-        url="http://localhost:8000/saveFile",
-        data={
-            "file_id": file_info.file_id,
-            "filename": file_info.filename,
-            "filesize": file_info.filesize,
-        },
-        files={"file": (file.filename, file.file, file.content_type)},
-    )
+    log.connection_id = connection_info.connection_id
+    log.file_id = file_info.file_id
+    log.extension["src"] = connection_info.source_addr
+    log.extension["host"] = connection_service.get_host_ip()
 
-    if store_file.status_code == 201:
-        logging.debug("File store request was successful")
-        log.event = "File store request successful"
-        log.severity = 1
-        log.log_id = "L0001"
+    try:
+        store_file: APIResponse = requests.post(
+            url="http://localhost:8000/saveFile",
+            data={
+                "file_id": file_info.file_id,
+                "filename": file_info.filename,
+                "filesize": file_info.filesize,
+            },
+            files={"file": (file.filename, file.file, file.content_type)},
+        )
+    except Exception as error:
+        logging.debug(f"Connection to File Storage failed - error - {error}")
+        log.event = "File Upload Failed"
+        log.severity = 5
+        log.log_id = "L0002"
+        log.extension["message"] = "Connection to File Storage failed"
         log.log()
+        raise HTTPException(500, detail={"message": "No connection to File Storage"})
+
+    if store_file.status_code != 201:
+        logging.debug(f"File Storage response was NOT 201")
+        log.event = "File Upload failed"
+        log.severity = 5
+        log.log_id = "L0002"
+        log.extension["message"] = "File Storage response was NOT 201"
+        log.log()
+        raise HTTPException(500, detail={"message": "File could NOT be stored"})
+
+    logging.debug("File Storage request was successful")
+    log.event = "File Upload Successful"
+    log.severity = 1
+    log.log_id = "L0001"
+    log.extension["message"] = "Connection to File Storage successful"
+    log.log()
 
     response = Response(
         message="POST Upload", file_info=file_info, connection_info=connection_info
