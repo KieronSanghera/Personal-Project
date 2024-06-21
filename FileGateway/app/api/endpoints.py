@@ -41,7 +41,7 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
             },
             files={"file": (file.filename, file.file, file.content_type)},
         )
-    except Exception as error:
+    except requests.exceptions.ConnectionError as error:
         logging.debug(f"Connection to File Storage failed - error - {error}")
         log.event = "File Upload Failed"
         log.severity = 5
