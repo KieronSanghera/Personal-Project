@@ -25,4 +25,3 @@ class TestUploadSuccess():
             response: Response = test_client.post(url="/upload", files=files)
             
         assert response.status_code == 200
-        print(response.json())

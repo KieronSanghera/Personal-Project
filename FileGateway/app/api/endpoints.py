@@ -27,9 +27,10 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
     file_info: FileInformation = file_service.get_metadata(file=file)
 
     log.connection_id = connection_info.connection_id
-    log.file_id = file_info.file_id
     log.extension["src"] = connection_info.source_addr
     log.extension["host"] = connection_service.get_host_ip()
+
+    log.file_id = file_info.file_id
 
     try:
         store_file: APIResponse = requests.post(
@@ -42,9 +43,9 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
             files={"file": (file.filename, file.file, file.content_type)},
         )
     except requests.exceptions.ConnectionError as error:
-        logging.debug(f"Connection to File Storage failed - error - {error}")
+        logging.error(f"Connection to File Storage failed - error - {error}")
         log.event = "File Upload Failed"
-        log.severity = 5
+        log.severity = 10
         log.log_id = "L0002"
         log.extension["message"] = "Connection to File Storage failed"
         log.log()
@@ -52,7 +53,7 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
 
     if store_file.status_code != 201:
         logging.debug(f"File Storage response was NOT 201")
-        log.event = "File Upload failed"
+        log.event = "File Upload Failed"
         log.severity = 5
         log.log_id = "L0002"
         log.extension["message"] = "File Storage response was NOT 201"
