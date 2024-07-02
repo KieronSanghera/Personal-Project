@@ -28,8 +28,8 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
 
     log.connection_id = connection_info.connection_id
     log.extension["src"] = connection_info.source_addr
-    log.extension["host"] = connection_service.get_host_ip()
-
+    log.extension["host"] = connection_info.host_addr
+    
     log.file_id = file_info.file_id
 
     try:

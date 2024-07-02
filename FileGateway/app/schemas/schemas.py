@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from pydantic.networks import IPvAnyAddress
 from typing import Union
 from uuid import UUID
 from datetime import datetime
@@ -9,6 +10,7 @@ class ConnectionInformation(BaseModel):
     connection_id: UUID 
     source_addr: str = "Unknown"
     request_time: datetime = datetime.now()
+    host_addr: IPvAnyAddress = "127.0.0.1"
     
 class FileInformation(BaseModel):
     """File Information Base Model"""
