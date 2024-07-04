@@ -10,7 +10,7 @@ class EnvConfig(BaseSettings):
     """Load and parse environment variables"""
 
     log_level: Union[int, str] = 20
-    store_path: PosixPath = PosixPath("./")
+    store_dir: PosixPath = PosixPath("./")
 
     @property
     def is_debug(self):
