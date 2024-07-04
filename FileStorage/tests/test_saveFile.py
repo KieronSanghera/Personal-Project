@@ -5,8 +5,8 @@ from app.api import endpoints
 from httpx import Response
 from pathlib import PosixPath
 from uuid import uuid4
-from file_factory import FileFactory
-from unittest import mock
+from file_factory import FileInformationFactory
+from unittest.mock import patch, MagicMock
 
 
 @fixture(autouse=True)
@@ -24,16 +24,23 @@ def setup_test_client(tmp_path):
 class TestSaveFileSuccess:
     """Class to test save file functionality"""
 
-    def test_successful_saveFile(self, setup_test_client):
+    def test_successful_saveFile(self, setup_test_client, tmpdir):
         test_client, file = setup_test_client
-        file_data = FileFactory.create()
-        with open(file, "rb") as tmpfile:
-            files = {"file": tmpfile}
-            response: Response = test_client.post(
-                url="/saveFile",
-                data=file_data,
-                files=files,
-            )
+        file_data = FileInformationFactory.create_dict()
+        with patch.object(
+            PosixPath,
+            "resolve",
+            MagicMock(
+                return_value=PosixPath(f"{tmpdir}/{file_data['file_id']}").resolve()
+            ),
+        ):
+            with open(file, "rb") as tmpfile:
+                files = {"file": tmpfile}
+                response: Response = test_client.post(
+                    url="/saveFile",
+                    data=file_data,
+                    files=files,
+                )
 
         assert response.status_code == 201
 
@@ -41,10 +48,10 @@ class TestSaveFileSuccess:
 class TestSaveFileFailure:
     """Class to test save file functionality failure"""
 
-    @mock.patch("shutil.copyfileobj", mock.MagicMock(side_effect=IOError()))
-    def test_store_file_failure(self, setup_test_client):
+    @patch("shutil.copyfileobj", MagicMock(side_effect=IOError()))
+    def test_saveFile_store_file_failure_IOERROR(self, setup_test_client):
         test_client, file = setup_test_client
-        file_data = FileFactory.create()
+        file_data = FileInformationFactory.create_dict()
         with open(file, "rb") as tmpfile:
             files = {"file": tmpfile}
             response: Response = test_client.post(
@@ -52,5 +59,128 @@ class TestSaveFileFailure:
                 data=file_data,
                 files=files,
             )
+
+        print(response.content)
+        assert response.status_code == 500
+
+    @patch("shutil.copyfileobj", MagicMock(side_effect=TypeError()))
+    def test_saveFile_store_file_failure_TYPEERROR(self, setup_test_client):
+        test_client, file = setup_test_client
+        file_data = FileInformationFactory.create_dict()
+        with open(file, "rb") as tmpfile:
+            files = {"file": tmpfile}
+            response: Response = test_client.post(
+                url="/saveFile",
+                data=file_data,
+                files=files,
+            )
+
+        assert response.status_code == 500
+
+    @patch("shutil.copyfileobj", MagicMock(side_effect=MemoryError()))
+    def test_saveFile_store_file_failure_MEMORYERROR(self, setup_test_client):
+        test_client, file = setup_test_client
+        file_data = FileInformationFactory.create_dict()
+        with open(file, "rb") as tmpfile:
+            files = {"file": tmpfile}
+            response: Response = test_client.post(
+                url="/saveFile",
+                data=file_data,
+                files=files,
+            )
+
+        assert response.status_code == 500
+
+    @patch("shutil.copyfileobj", MagicMock(side_effect=Exception()))
+    def test_saveFile_store_file_failure_EXCEPTION(self, setup_test_client):
+        test_client, file = setup_test_client
+        file_data = FileInformationFactory.create_dict()
+        with open(file, "rb") as tmpfile:
+            files = {"file": tmpfile}
+            response: Response = test_client.post(
+                url="/saveFile",
+                data=file_data,
+                files=files,
+            )
+
+        assert response.status_code == 500
+
+    @patch("shutil.copyfileobj", MagicMock(side_effect=Exception()))
+    @patch(
+        "app.services.file_service.PosixPath.unlink", MagicMock(side_effect=Exception())
+    )
+    def test_saveFile_store_file_failure_unlink_EXCEPTION(
+        self, setup_test_client, tmpdir
+    ):
+        test_client, file = setup_test_client
+        file_data = FileInformationFactory.create_dict()
+        with patch.object(
+            PosixPath,
+            "resolve",
+            MagicMock(
+                return_value=PosixPath(f"{tmpdir}/{file_data['file_id']}").resolve()
+            ),
+        ):
+            with open(file, "rb") as tmpfile:
+                files = {"file": tmpfile}
+                response: Response = test_client.post(
+                    url="/saveFile",
+                    data=file_data,
+                    files=files,
+                )
+
+        assert response.status_code == 500
+
+    @patch("shutil.copyfileobj", MagicMock(side_effect=Exception()))
+    @patch(
+        "app.services.file_service.PosixPath.unlink",
+        MagicMock(side_effect=PermissionError()),
+    )
+    def test_saveFile_store_file_failure_unlink_PERMISSIONERROR(
+        self, setup_test_client, tmpdir
+    ):
+        test_client, file = setup_test_client
+        file_data = FileInformationFactory.create_dict()
+        with patch.object(
+            PosixPath,
+            "resolve",
+            MagicMock(
+                return_value=PosixPath(f"{tmpdir}/{file_data['file_id']}").resolve()
+            ),
+        ):
+            with open(file, "rb") as tmpfile:
+                files = {"file": tmpfile}
+                response: Response = test_client.post(
+                    url="/saveFile",
+                    data=file_data,
+                    files=files,
+                )
+
+        assert response.status_code == 500
+
+    @patch("shutil.copyfileobj", MagicMock(side_effect=Exception()))
+    @patch(
+        "app.services.file_service.PosixPath.unlink",
+        MagicMock(side_effect=FileNotFoundError()),
+    )
+    def test_saveFile_store_file_failure_unlink_FILENOTFOUNDERROR(
+        self, setup_test_client, tmpdir
+    ):
+        test_client, file = setup_test_client
+        file_data = FileInformationFactory.create_dict()
+        with patch.object(
+            PosixPath,
+            "resolve",
+            MagicMock(
+                return_value=PosixPath(f"{tmpdir}/{file_data['file_id']}").resolve()
+            ),
+        ):
+            with open(file, "rb") as tmpfile:
+                files = {"file": tmpfile}
+                response: Response = test_client.post(
+                    url="/saveFile",
+                    data=file_data,
+                    files=files,
+                )
 
         assert response.status_code == 500

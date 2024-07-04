@@ -3,9 +3,13 @@ import socket
 from app.schemas.schemas import ConnectionInformation
 from uuid import uuid4
 
+
 def connection_info(request: Request):
-    info = ConnectionInformation(connection_id=uuid4(), source_addr=request.client.host)
+    info = ConnectionInformation(
+        connection_id=uuid4(), source_addr=request.client.host, host_addr=get_host_ip()
+    )
     return info
+
 
 def get_host_ip():
     try:
