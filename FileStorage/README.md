@@ -1,2 +1,3 @@
 # FileStorage
- Component to store files that enter the project
+
+ Component to store files that enter the system.

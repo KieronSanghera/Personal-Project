@@ -23,7 +23,7 @@
 
 - File Transfer Protocol (FTP)
 - Email Upload
-- Command Line Interface Upload
+- Command Line Interface (CLI) Upload
 
 ### File Storage
 
