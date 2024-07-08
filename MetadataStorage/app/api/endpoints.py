@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Depends, Form
+from fastapi import APIRouter, Request, Depends, Form, HTTPException
 from typing import Annotated
 import redis.asyncio as redis
 from app.dependencies import dependency
@@ -21,21 +21,25 @@ async def new_metadata(
     file_data: FileInformation = Depends(FileInformation.as_form),
     redis_connection: redis.Redis = Depends(dependency.get_redis),
 ):
-    await redis_connection.hset(name=f"FileData{file_data.file_id}", key="metadata", value=str(file_data.model_dump()))
-    print(file_data.model_dump_database())
-    
-    return {"message": "Metadata Stored", "storage_info": f"FileData{file_data.file_id}"}
-    
+    if not await redis_services.new_metadata(
+        file_data=file_data, redis_connection=redis_connection
+    ):
+        raise HTTPException(status_code=500, detail="Not stored in database")
+    return {
+        "message": "Metadata Stored",
+        "storage_info": f"FileData{file_data.file_id}",
+    }
+
+
 @router.get("/getMetadata")
 async def get_file_metadata(
     file_id: Annotated[UUID, Form()],
     redis_connection: redis.Redis = Depends(dependency.get_redis),
 ):
-    metadata = await redis_services.get_metadata(file_id=file_id, redis_connection=redis_connection)    
-    print(metadata)
+    metadata = await redis_services.get_metadata(
+        file_id=file_id, redis_connection=redis_connection
+    )
     return metadata
-    
-
 
 
 ### TODO: redis connection now set, need to probably use hash (learn
