@@ -6,7 +6,7 @@ from datetime import datetime
 from dataclasses import dataclass
 from typing import Union, Optional
 import logging
-from pathlib import Path
+from pathlib import PosixPath
 
 
 class ConnectionInformation(BaseModel):
@@ -24,7 +24,7 @@ class FileInformation(BaseModel):
     file_id: UUID
     filename: str
     filesize: int = Field(ge=0)
-    location: Optional[Path] = None
+    location: Optional[PosixPath] = None
 
     @classmethod
     def as_form(

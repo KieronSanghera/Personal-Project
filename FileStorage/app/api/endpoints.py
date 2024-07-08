@@ -27,7 +27,7 @@ async def root():
 async def save_file(
     request: Request,
     file: UploadFile,
-    form_data: FileInformation = Depends(FileInformation.as_form),
+    file_data: FileInformation = Depends(FileInformation.as_form),
 ) -> JSONResponse:
     log: CommonEventFormat = CommonEventFormat(version="0.1.0")
 
@@ -39,10 +39,10 @@ async def save_file(
     log.extension["src"] = connection_info.source_addr
     log.extension["host"] = connection_info.host_addr
 
-    log.file_id = form_data.file_id
+    log.file_id = file_data.file_id
 
     try:
-        file_service.store_file(file=file, file_info=form_data)
+        file_service.store_file(file=file, file_info=file_data)
         response_content = {"message": "File successfully store"}
     except OSError as error:
         logging.error(f"Storage OSError - error - {error}")
@@ -51,7 +51,7 @@ async def save_file(
         log.log_id = "L0011"
         log.extension["message"] = "Error Occurred when storing due to OSError"
         log.log()
-        file_service.failed_file(form_data.location)
+        file_service.failed_file(file_data.location)
         raise HTTPException(500, detail={"message": "Error when storing file"})
     except TypeError as error:
         logging.error(f"Storage TypeError - error - {error}")
@@ -60,7 +60,7 @@ async def save_file(
         log.log_id = "L0011"
         log.extension["message"] = "Error Occurred when storing due to TypeError"
         log.log()
-        file_service.failed_file(form_data.location)
+        file_service.failed_file(file_data.location)
         raise HTTPException(500, detail={"message": "Error when storing file"})
     except MemoryError as error:
         logging.error(f"Storage Memory - error - {error}")
@@ -69,7 +69,7 @@ async def save_file(
         log.log_id = "L0011"
         log.extension["message"] = "Error Occurred when storing due to Memory"
         log.log()
-        file_service.failed_file(form_data.location)
+        file_service.failed_file(file_data.location)
         raise HTTPException(500, detail={"message": "Error when storing file"})
     except Exception as error:
         logging.error(f"Storage Unhandled Error - error - {error}")
@@ -80,7 +80,7 @@ async def save_file(
             "Error Occurred when storing due to an Unhandled Error"
         )
         log.log()
-        file_service.failed_file(form_data.location)
+        file_service.failed_file(file_data.location)
         raise HTTPException(500, detail={"message": "Error when storing file"})
 
     logging.debug("Store File was successful")
