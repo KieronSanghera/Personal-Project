@@ -40,12 +40,3 @@ async def get_file_metadata(
         file_id=file_id, redis_connection=redis_connection
     )
     return metadata
-
-
-### TODO: redis connection now set, need to probably use hash (learn
-#   about it more first). Then need to structure request by getting
-#   the information to store and then storing that for the first time.
-#
-#   What I might need, file information and everything else too?
-#   Separate ones for each or all together
-###

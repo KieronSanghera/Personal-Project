@@ -5,10 +5,17 @@ from app.schemas.schemas import FileInformation
 
 
 async def new_metadata(file_data: FileInformation, redis_connection: redis.Redis):
-    
-    response = await redis_connection.hset(name=f"FileData{file_data.file_id}", key="metadata", value=str(file_data.model_dump_database()))
-    # check if key exists already
-    return response
+    response = await redis_connection.hset(
+        name=f"FileData{file_data.file_id}",
+        key="metadata",
+        value=str(file_data.model_dump_database()),
+    )
+    if response < 1:
+        exists = await redis_connection.exists(f"FileData{file_data.file_id}")
+        if not exists:
+            return False
+
+    return True
 
 
 async def get_metadata(file_id: UUID, redis_connection: redis.Redis):
