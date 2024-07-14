@@ -60,7 +60,7 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
         log.log()
         raise HTTPException(500, detail={"message": "File could NOT be stored"})
 
-    logging.debug("File Storage request was successful")
+    logging.info("File Storage request was successful")
     log.event = "File Upload Successful"
     log.severity = 1
     log.log_id = "L0001"
