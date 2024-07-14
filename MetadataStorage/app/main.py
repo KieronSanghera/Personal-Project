@@ -9,17 +9,19 @@ import logging
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    redis_client = await redis.Redis(host="localhost", port=6379, db=0)
+    redis_client = await redis.Redis(host=configs.redis_hostname, port=6379, db=0)
     # Implement a timeout
     try:
+        await redis_client.ping()
         logging.info("Redis Connection Successful")
         app.state.redis = redis_client
         # TODO: Make ready check True
     except redisExceptions.ConnectionError as error:
         logging.error("Redis Connection Failed")
         # TODO: Make ready check False
-    yield 
-    await redis_client.close()
-    
+    yield
+    await redis_client.aclose()
+
+
 app = FastAPI(debug=configs.is_debug, lifespan=lifespan)
 app.include_router(api_router)

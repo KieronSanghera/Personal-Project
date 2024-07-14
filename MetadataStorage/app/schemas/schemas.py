@@ -1,10 +1,20 @@
 from pydantic import BaseModel, Field
 from fastapi import Form
-from typing import Union, Optional, Dict, Any
+from typing import Union, Dict, Any
 from uuid import UUID
 from datetime import datetime
 import logging
 from pathlib import PosixPath
+from pydantic import IPvAnyAddress
+
+
+class ConnectionInformation(BaseModel):
+    """Connection Information Base Model"""
+
+    connection_id: UUID
+    source_addr: str = "Unknown"
+    request_time: datetime = datetime.now()
+    host_addr: IPvAnyAddress = "127.0.0.1"
 
 
 class FileInformation(BaseModel):
@@ -23,7 +33,9 @@ class FileInformation(BaseModel):
         filesize: int = Form(...),
         location: PosixPath = Form(...),
     ) -> "FileInformation":
-        return cls(file_id=file_id, filename=filename, filesize=filesize, location=location)
+        return cls(
+            file_id=file_id, filename=filename, filesize=filesize, location=location
+        )
 
     def model_dump_database(self) -> Dict[str, Any]:
         primitive_dict = {}
@@ -37,22 +49,25 @@ class FileInformation(BaseModel):
     def _to_primitive(value: Any) -> Any:
         if isinstance(value, (int, float, str, bool)):
             return value
-        elif isinstance(value, dict):
-            return {k: FileInformation._to_primitive(v) for k, v in value.items()}
-        elif isinstance(value, (list, set, tuple)):
-            return [FileInformation._to_primitive(item) for item in value]
-        elif hasattr(value, "model_dump"):
-            return value.model_dump()
         else:
             return str(value)
+
+
+class Response(BaseModel):
+    """Response Base Model"""
+
+    message: str
+    metadata: FileInformation
+    connection_info: ConnectionInformation
+
 
 class CommonEventFormat(BaseModel):
     """CEF Base Model"""
 
     vendor: str = "Project"
-    service: str = "FileGateway"
-    version: str = Field(pattern="^\d+\.\d+\.\d+$")
-    log_id: str = Field(pattern="^L\d+$", default="L0")
+    service: str = "MetadataStorage"
+    version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    log_id: str = Field(pattern=r"^L\d+$", default="L0")
     event: str = "No Event"
     severity: int = Field(ge=0, le=10, default=0)
     timestamp: datetime = datetime.now()
