@@ -1,4 +1,3 @@
-from app.config import configs
 from fastapi import UploadFile
 import shutil
 import logging
@@ -7,7 +6,6 @@ from pathlib import PosixPath
 
 
 def store_file(file: UploadFile, file_info: FileInformation) -> bool:
-    file_info.location = PosixPath(f"{configs.store_dir}/{file_info.file_id}").resolve()
     with open(file_info.location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     logging.info("File successfully stored")

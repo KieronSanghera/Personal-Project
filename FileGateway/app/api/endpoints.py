@@ -34,7 +34,7 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
 
     try:
         store_file: APIResponse = requests.post(
-            url="http://localhost:8000/saveFile",
+            url="http://localhost:8080/saveFile",
             data={
                 "file_id": file_info.file_id,
                 "filename": file_info.filename,
@@ -42,11 +42,12 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
             },
             files={"file": (file.filename, file.file, file.content_type)},
         )
+        logging.info(store_file.content)
     except requests.exceptions.ConnectionError as error:
         logging.error(f"Connection to File Storage failed - error - {error}")
         log.event = "File Upload Failed"
         log.severity = 10
-        log.log_id = "L0002"
+        log.log_id = "L0001"
         log.extension["message"] = "Connection to File Storage failed"
         log.log()
         raise HTTPException(500, detail={"message": "No connection to File Storage"})
@@ -55,7 +56,7 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
         logging.debug(f"File Storage response was NOT 201")
         log.event = "File Upload Failed"
         log.severity = 5
-        log.log_id = "L0002"
+        log.log_id = "L0001"
         log.extension["message"] = "File Storage response was NOT 201"
         log.log()
         raise HTTPException(500, detail={"message": "File could NOT be stored"})
@@ -63,7 +64,7 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
     logging.info("File Storage request was successful")
     log.event = "File Upload Successful"
     log.severity = 1
-    log.log_id = "L0001"
+    log.log_id = "L0000"
     log.extension["message"] = "Connection to File Storage successful"
     log.log()
 

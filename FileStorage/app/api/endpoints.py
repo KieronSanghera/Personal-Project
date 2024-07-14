@@ -7,13 +7,15 @@ from fastapi import (
     HTTPException,
 )
 from fastapi.responses import JSONResponse
-from app.services import file_service, connection_service
+from app.services import file_service, connection_service, metadata_service
 from app.schemas.schemas import (
     FileInformation,
     ConnectionInformation,
     CommonEventFormat,
 )
 import logging
+from pathlib import PosixPath
+from app.config import configs
 
 router = APIRouter()
 
@@ -40,6 +42,19 @@ async def save_file(
     log.extension["host"] = connection_info.host_addr
 
     log.file_id = file_data.file_id
+    file_data.location = PosixPath(f"{configs.store_dir}/{file_data.file_id}").resolve()
+
+    
+    metadata_stored = metadata_service.new_metadata_request(file_data=file_data)
+
+    if not metadata_stored:
+        logging.error(f"Metadata could NOT be stored")
+        log.event = "File Storage Failed"
+        log.severity = 10
+        log.log_id = "L0011"
+        log.extension["message"] = "Error Occurred when storing due to Metadata Storage request"
+        log.log()
+        raise HTTPException(500, detail={"message": "Error making request to Metadata Storage"})
 
     try:
         file_service.store_file(file=file, file_info=file_data)
@@ -81,7 +96,7 @@ async def save_file(
         )
         log.log()
         file_service.failed_file(file_data.location)
-        raise HTTPException(500, detail={"message": "Error when storing file"})
+        raise HTTPException(500, detail={"message": "Error when storing file"})    
 
     logging.debug("Store File was successful")
     log.event = "File Storage Success"

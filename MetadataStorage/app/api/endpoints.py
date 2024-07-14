@@ -58,7 +58,7 @@ async def new_metadata(
         logging.error(f"Connection Error to redis {error}")
         log.event = "New Metadata Storage Request Failed"
         log.severity = 10
-        log.log_id = "L0022"
+        log.log_id = "L0021"
         log.extension["message"] = "New metadata storage request failed"
         log.log()
         raise HTTPException(500, detail={"message": "Redis Error"})
@@ -66,7 +66,7 @@ async def new_metadata(
         logging.error(f"Asyncio error {error}")
         log.event = "New Metadata Storage Request Failed"
         log.severity = 10
-        log.log_id = "L0022"
+        log.log_id = "L0021"
         log.extension["message"] = "New metadata storage request failed"
         log.log()
         raise HTTPException(500, detail={"message": "Asyncio Error"})
@@ -74,7 +74,7 @@ async def new_metadata(
         logging.error(f"Unhandled Error raised {error}")
         log.event = "New Metadata Storage Request Failed"
         log.severity = 10
-        log.log_id = "L0022"
+        log.log_id = "L0021"
         log.extension["message"] = "New metadata storage request failed"
         log.log()
         raise HTTPException(500, detail={"message": "Internal Error"})
@@ -83,10 +83,18 @@ async def new_metadata(
         logging.info(f"Metadata NOT Stored")
         log.event = "New Metadata Storage Request Failed"
         log.severity = 10
-        log.log_id = "L0022"
+        log.log_id = "L0021"
         log.extension["message"] = "New metadata storage request failed"
         log.log()
         raise HTTPException(500, detail={"message": "Metadata NOT Stored"})
+
+    logging.debug("Store Metadata was successful")
+    log.event = "Metadata Storage Success"
+    log.severity = 5
+    log.log_id = "L0020"
+    log.extension["message"] = "File Metadata was successfully stored"
+    log.log()
+
 
     return {
         "message": "Metadata Stored",
