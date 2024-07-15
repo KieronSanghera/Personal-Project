@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from app.api.endpoints import router as api_router
+from app.api.endpoints import router as endpoint_router
+from app.api.health import router as health_router
 from app.config import configs
 from contextlib import asynccontextmanager
 import redis.asyncio as redis
@@ -24,4 +25,5 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(debug=configs.is_debug, lifespan=lifespan)
-app.include_router(api_router)
+app.include_router(endpoint_router)
+app.include_router(health_router)
