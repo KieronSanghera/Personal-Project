@@ -41,8 +41,8 @@ class CommonEventFormat(BaseModel):
 
     vendor: str = "Project"
     service: str = "FileStorage"
-    version: str = Field(pattern="^\d+\.\d+\.\d+$")
-    log_id: str = Field(pattern="^L\d+$", default="L0")
+    version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    log_id: str = Field(pattern=r"^L\d+$", default="L0")
     event: str = "No Event"
     severity: int = Field(ge=0, le=10, default=0)
     timestamp: datetime = datetime.now()

@@ -2,7 +2,7 @@ from app.services import connection_service
 from app.schemas.schemas import ConnectionInformation
 from unittest.mock import patch, MagicMock
 import pytest
-from .request_factory import RequestFactory
+from request_factory import RequestFactory
 from uuid import UUID
 from ipaddress import IPv4Address
 
