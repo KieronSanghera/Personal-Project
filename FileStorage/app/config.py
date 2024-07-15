@@ -11,7 +11,9 @@ class EnvConfig(BaseSettings):
 
     log_level: Union[int, str] = 20
     store_dir: PosixPath = PosixPath("./")
-
+    metadata_storage_addr: str = "localhost"
+    metadata_storage_port: int = 80
+    
     @property
     def is_debug(self):
         log_level = (

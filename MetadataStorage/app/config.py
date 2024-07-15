@@ -10,6 +10,7 @@ class EnvConfig(BaseSettings):
 
     log_level: Union[int, str] = 20
     redis_hostname: str = "localhost"
+    redis_port: int = 6379
 
     @property
     def is_debug(self):

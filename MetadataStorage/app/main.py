@@ -10,7 +10,9 @@ import logging
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    redis_client = await redis.Redis(host=configs.redis_hostname, port=6379, db=0)
+    redis_client = await redis.Redis(
+        host=configs.redis_hostname, port=configs.redis_port, db=0
+    )
     # Implement a timeout
     try:
         await redis_client.ping()

@@ -9,6 +9,8 @@ class EnvConfig(BaseSettings):
     """Load and parse environment variables"""
 
     log_level: Union[int, str] = 20
+    file_storage_addr: str = "localhost"
+    file_storage_port: int = 80
 
     @property
     def is_debug(self):
