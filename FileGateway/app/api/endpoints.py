@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, Request, HTTPException
-from app.services import file_service, connection_service
+from app.services import file_service, connection_service, file_storage_service
 from app.schemas.schemas import (
     Response,
     FileInformation,
@@ -24,17 +24,16 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
     connection_info: ConnectionInformation = connection_service.connection_info(
         request=request
     )
-    file_info: FileInformation = file_service.get_metadata(file=file)
+    file_info: FileInformation = file_service.get_filedata(file=file)
 
     log.connection_id = connection_info.connection_id
     log.extension["src"] = connection_info.source_addr
     log.extension["host"] = connection_info.host_addr
-    
+
     log.file_id = file_info.file_id
 
     try:
-        store_file: APIResponse = requests.post(
-            url="http://localhost:8080/saveFile",
+        store_file = file_storage_service.store_file(
             data={
                 "file_id": file_info.file_id,
                 "filename": file_info.filename,
@@ -42,7 +41,6 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
             },
             files={"file": (file.filename, file.file, file.content_type)},
         )
-        logging.info(store_file.content)
     except requests.exceptions.ConnectionError as error:
         logging.error(f"Connection to File Storage failed - error - {error}")
         log.event = "File Upload Failed"
