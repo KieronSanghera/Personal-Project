@@ -1,0 +1,18 @@
+services:
+  file_gateway:
+    build:
+      context: ../FileGateway
+      dockerfile: ./docker/Dockerfile
+    image: file_gateway
+
+  file_storage:
+    build:
+      context: ../FileStorage
+      dockerfile: ./docker/Dockerfile
+    image: file_storage
+
+  metadata_storage:
+    build:
+      context: ../MetadataStorage
+      dockerfile: ./docker/Dockerfile
+    image: metadata_storage
