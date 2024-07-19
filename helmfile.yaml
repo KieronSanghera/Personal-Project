@@ -1,0 +1,15 @@
+releases:
+  - name: file-gateway
+    chart: ./FileGateway/helm
+    values:
+      - ./FileGateway/helm/values.yaml
+
+  - name: file-storage
+    chart: ./FileStorage/helm
+    values:
+      - ./FileStorage/helm/values.yaml
+
+  - name: metadata-storage
+    chart: ./MetadataStorage/helm
+    values:
+      - ./MetadataStorage/helm/values.yaml

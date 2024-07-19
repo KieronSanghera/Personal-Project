@@ -15,6 +15,8 @@ def new_metadata_request(file_data: FileInformation) -> bool:
         logging.debug("Metadata Stored")
         return True
     
+    logging.info(f"{metadata_response=}")
+    
     contents = json.loads(metadata_response.content.decode())
     logging.debug(f"Metadata NOT Stored - message - {contents['detail']}")
     return False

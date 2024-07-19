@@ -15,6 +15,7 @@ router = APIRouter()
 
 @router.get("/")
 async def root():
+    logging.info("REQUEST RECEIVED")
     return {"message": "Default"}
 
 
@@ -24,6 +25,7 @@ async def file_upload(request: Request, file: UploadFile) -> Response:
     connection_info: ConnectionInformation = connection_service.connection_info(
         request=request
     )
+    logging.info("REQUEST RECEIVED")
     file_info: FileInformation = file_service.get_filedata(file=file)
 
     log.connection_id = connection_info.connection_id

@@ -31,6 +31,7 @@ async def save_file(
     file: UploadFile,
     file_data: FileInformation = Depends(FileInformation.as_form),
 ) -> JSONResponse:
+    logging.info("REQUEST RECEIVED")
     log: CommonEventFormat = CommonEventFormat(version="0.1.0")
 
     connection_info: ConnectionInformation = connection_service.connection_info(
