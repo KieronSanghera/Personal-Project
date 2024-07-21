@@ -1,18 +1,18 @@
 services:
   file_gateway:
     build:
-      context: ../FileGateway
+      context: ../microservices/FileGateway
       dockerfile: ./docker/Dockerfile
     image: file_gateway
 
   file_storage:
     build:
-      context: ../FileStorage
+      context: ../microservices/FileStorage
       dockerfile: ./docker/Dockerfile
     image: file_storage
 
   metadata_storage:
     build:
-      context: ../MetadataStorage
+      context: ../microservices/MetadataStorage
       dockerfile: ./docker/Dockerfile
     image: metadata_storage
