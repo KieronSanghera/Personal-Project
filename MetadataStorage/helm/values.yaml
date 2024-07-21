@@ -4,8 +4,7 @@
 
 replicaCount: 1
 
-namespace: microservices
-
+namespace: project
 
 image:
   repository: "metadata_storage"
@@ -13,8 +12,8 @@ image:
   pullPolicy: Never
 
 env:
-  REDIS_HOSTNAME: redis-master
-  
+  REDIS_HOSTNAME: redis-master.redis.svc.cluster.local
+
 imagePullSecrets: []
 nameOverride: ""
 

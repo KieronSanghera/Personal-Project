@@ -4,8 +4,7 @@
 
 replicaCount: 1
 
-namespace: microservices
-
+namespace: project
 
 image:
   repository: "file_gateway"

@@ -1,0 +1,3 @@
+pvc:
+  name: file-store-pvc
+  storage: 10Gi

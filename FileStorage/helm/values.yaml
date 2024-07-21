@@ -4,8 +4,7 @@
 
 replicaCount: 1
 
-namespace: microservices
-
+namespace: project
 
 image:
   repository: "file_storage"
@@ -13,11 +12,27 @@ image:
   pullPolicy: Never
 
 env:
+  STORE_DIR: "/etc/file-store/"
   METADATA_STORAGE_ADDR: "metadata-storage-svc"
   METADATA_STORAGE_PORT: 80
 
 imagePullSecrets: []
 nameOverride: ""
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts:
+  - name: file-store
+    mountPath: "/etc/file-store"
+
+# Additional volumes on the output Deployment definition.
+volumes: 
+  - name: file-store
+    PersistentVolumeClaim:
+      claimName: file-store-pvc
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -91,19 +106,6 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
-
-# Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
-
-# Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
 
 nodeSelector: {}
 

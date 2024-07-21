@@ -11,7 +11,7 @@ import logging
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     redis_client = await redis.Redis(
-        host=configs.redis_hostname, port=configs.redis_port, db=0
+        host=configs.redis_hostname, port=configs.redis_port, username="default", password="password", db=0
     )
     # Implement a timeout
     try:
