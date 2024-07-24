@@ -43,8 +43,6 @@ async def save_file(
     log.extension["host"] = connection_info.host_addr
 
     log.file_id = file_data.file_id
-    file_data.location = PosixPath(f"{configs.store_dir}/{file_data.file_id}").resolve()
-
     
     metadata_stored = metadata_service.new_metadata_request(file_data=file_data)
 

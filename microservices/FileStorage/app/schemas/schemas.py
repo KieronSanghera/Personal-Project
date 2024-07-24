@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from pydantic.networks import IPvAnyAddress
 from fastapi import Form
 from uuid import UUID
@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Union, Optional
 import logging
 from pathlib import PosixPath
-
+from config import configs
 
 class ConnectionInformation(BaseModel):
     """Connection Information Base Model"""
@@ -25,7 +25,12 @@ class FileInformation(BaseModel):
     filename: str
     filesize: int = Field(ge=0)
     location: Optional[PosixPath] = None
-
+    
+    @model_validator(mode="after")
+    def set_location(self):
+        self.location = PosixPath(f"{configs.store_dir}/{self.file_id}").resolve()
+        return self
+    
     @classmethod
     def as_form(
         cls,
