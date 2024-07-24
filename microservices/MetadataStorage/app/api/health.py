@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query
-
+from datetime import datetime
 
 router = APIRouter()
 
@@ -12,7 +12,7 @@ async def livez(verbose: bool = Query(False, description="Include verbose inform
             "status": "ok",
             "details": {
                 "message": "Service is live and operational.",
-                "timestamp": "2024-07-15T12:00:00Z"
+                "timestamp": datetime.now()
             }
         }
     else:
@@ -27,7 +27,7 @@ async def readyz(verbose: bool = Query(False, description="Include verbose infor
             "status": "ready",
             "details": {
                 "message": "Service is ready to accept traffic.",
-                "timestamp": "2024-07-15T12:00:00Z"
+                "timestamp": datetime.now()
             }
         }
     else:
