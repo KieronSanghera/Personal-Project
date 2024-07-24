@@ -16,3 +16,9 @@ services:
       context: ../microservices/MetadataStorage
       dockerfile: ./docker/Dockerfile
     image: metadata_storage
+
+  file_release:
+    build:
+      context: ../microservices/FileRelease
+      dockerfile: ./docker/Dockerfile
+    image: file_release

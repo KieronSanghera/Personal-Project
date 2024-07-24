@@ -128,7 +128,7 @@ async def get_file_metadata(
         log.event = "Get Metadata Request Failed"
         log.severity = 10
         log.log_id = "L0024"
-        log.extension["message"] = "Request to store metadata failed"
+        log.extension["message"] = "Request to get metadata failed"
         log.log()
         raise HTTPException(500, detail={"message": "Redis Decode Error"})
     except json.JSONDecodeError as error:
@@ -136,7 +136,7 @@ async def get_file_metadata(
         log.event = "Get Metadata Request Failed"
         log.severity = 10
         log.log_id = "L0024"
-        log.extension["message"] = "Request to store metadata failed"
+        log.extension["message"] = "Request to get metadata failed"
         log.log()
         raise HTTPException(500, detail={"message": "Redis/Metadata Error"})
     except RedisException as error:
@@ -146,7 +146,7 @@ async def get_file_metadata(
         log.event = "Get Metadata Request Failed"
         log.severity = 10
         log.log_id = "L0024"
-        log.extension["message"] = "Request to store metadata failed"
+        log.extension["message"] = "Request to get metadata failed"
         log.log()
         raise HTTPException(500, detail={"message": "Metadata does not exist"})
     except ValidationError as error:
@@ -154,7 +154,7 @@ async def get_file_metadata(
         log.event = "Get Metadata Request Failed"
         log.severity = 10
         log.log_id = "L0024"
-        log.extension["message"] = "Request to store metadata failed"
+        log.extension["message"] = "Request to get metadata failed"
         log.log()
         raise HTTPException(
             500, detail={"message": "Metadata was not file information"}
@@ -164,7 +164,7 @@ async def get_file_metadata(
         log.event = "Get Metadata Request Failed"
         log.severity = 10
         log.log_id = "L0024"
-        log.extension["message"] = "Request to store metadata failed"
+        log.extension["message"] = "Request to get metadata failed"
         log.log()
         raise HTTPException(500, detail={"message": "Error when getting metadata"})
 

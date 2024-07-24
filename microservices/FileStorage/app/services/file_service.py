@@ -19,5 +19,5 @@ def failed_file(file_path: PosixPath):
         logging.error(f"Permission Error when removing file - error - {error}")
         return False
     except Exception as error:
-        print(f"Error: {error}")
+        logging.error(f"Error: {error}")
         return False

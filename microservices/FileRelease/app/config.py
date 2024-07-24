@@ -1,0 +1,58 @@
+from pydantic import model_validator
+from pydantic_settings import BaseSettings
+from typing import Union
+from typing_extensions import Self
+import logging
+from pathlib import PosixPath
+
+
+class EnvConfig(BaseSettings):
+    """Load and parse environment variables"""
+
+    log_level: Union[int, str] = 20
+    metadata_storage_addr: str = "localhost"
+    metadata_storage_port: int = 8002
+
+    @property
+    def is_debug(self):
+        log_level = (
+            self.log_level.lower()
+            if isinstance(self.log_level, str)
+            else self.log_level
+        )
+        return log_level in [10, "debug"]
+
+    @model_validator(mode="after")
+    def post_log_level(self) -> Self:
+        config_log_level = logging.INFO
+
+        if isinstance(self.log_level, int):
+            config_log_level = self.log_level
+
+        if isinstance(self.log_level, str):
+            log_level_upper = self.log_level.upper()
+
+            if log_level_upper in {
+                "CONFIG",
+                "ERROR",
+                "WARNING",
+                "INFO",
+                "DEBUG",
+                "NOTSET",
+            }:
+                config_log_level = log_level_upper
+
+            else:
+                try:
+                    config_log_level = int(config_log_level)
+                except ValueError as e:
+                    print(
+                        f"ERROR: Invalid LOG_LEVEL value, Defaulting to log level INFO"
+                        - {e}
+                    )
+        logging.getLogger().setLevel(config_log_level)
+
+
+configs = EnvConfig()
+for key, value in configs:
+    logging.info(f"{key} set to {value}")
