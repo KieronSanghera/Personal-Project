@@ -11,7 +11,7 @@ class EnvConfig(BaseSettings):
 
     log_level: Union[int, str] = 20
     metadata_storage_addr: str = "localhost"
-    metadata_storage_port: int = 8002
+    metadata_storage_port: int = 80
 
     @property
     def is_debug(self):
@@ -41,15 +41,14 @@ class EnvConfig(BaseSettings):
                 "NOTSET",
             }:
                 config_log_level = log_level_upper
-
             else:
                 try:
-                    config_log_level = int(config_log_level)
+                    config_log_level = int(self.log_level)
                 except ValueError as e:
-                    print(
-                        f"ERROR: Invalid LOG_LEVEL value, Defaulting to log level INFO"
-                        - {e}
+                    logging.error(
+                        f"Invalid LOG_LEVEL value, Defaulting to log level INFO - {e}"
                     )
+                    self.log_level = config_log_level
         logging.getLogger().setLevel(config_log_level)
 
 

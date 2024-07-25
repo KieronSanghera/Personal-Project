@@ -40,7 +40,7 @@ async def download_file(request: Request, file_id: UUID):
         log.extension["message"] = "Get metadata connection failed"
         log.log()
         raise HTTPException(500, detail={"message": "Download File Request Failed"})
-    except requests.exceptions.Timeout:
+    except requests.exceptions.Timeout as error:
         logging.error(f"Connection Timeout to Metadata Storage {error}")
         log.event = "Download File Request Failed"
         log.severity = 10
@@ -128,7 +128,7 @@ def delete(request: Request, file_id: UUID):
         log.extension["message"] = "Get metadata connection failed"
         log.log()
         raise HTTPException(500, detail={"message": "Delete File Request Failed"})
-    except requests.exceptions.Timeout:
+    except requests.exceptions.Timeout as error:
         logging.error(f"Connection Timeout to Metadata Storage {error}")
         log.event = "Delete File Request Failed"
         log.severity = 10
@@ -193,4 +193,4 @@ def delete(request: Request, file_id: UUID):
     log.log_id = "L0032"
     log.extension["message"] = "File was deleted successfully"
     log.log()
-    return Response(status_code=200)
+    return Response(status_code=200, content="File Successfully Deleted")
