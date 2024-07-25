@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Union, Optional
 import logging
 from pathlib import PosixPath
-from config import configs
+from app.config import configs
 
 class ConnectionInformation(BaseModel):
     """Connection Information Base Model"""
