@@ -30,7 +30,7 @@ class TestDeleteSuccess:
         fake_file_info = FileInformationFactory.create(file_id=file_id, location=file)
 
         with patch(
-            "app.services.file_service.get_file_info",
+            "app.services.metadata_service.get_file_info",
             MagicMock(return_value=fake_file_info),
         ):
             response = test_client.get(url=f"/download/{file_id}")
@@ -49,7 +49,7 @@ class TestDownloadFailure:
         fake_file_info = FileInformationFactory.create(file_id=file_id, location=file)
 
         with patch(
-            "app.services.file_service.get_file_info",
+            "app.services.metadata_service.get_file_info",
             MagicMock(side_effect=requests.exceptions.ConnectionError),
         ):
             response = test_client.get(url=f"/download/{file_id}")
@@ -66,7 +66,7 @@ class TestDownloadFailure:
         fake_file_info = FileInformationFactory.create(file_id=file_id, location=file)
 
         with patch(
-            "app.services.file_service.get_file_info",
+            "app.services.metadata_service.get_file_info",
             MagicMock(side_effect=requests.exceptions.Timeout),
         ):
             response = test_client.get(url=f"/download/{file_id}")
@@ -83,7 +83,7 @@ class TestDownloadFailure:
         fake_file_info = FileInformationFactory.create(file_id=file_id, location=file)
 
         with patch(
-            "app.services.file_service.get_file_info",
+            "app.services.metadata_service.get_file_info",
             MagicMock(side_effect=requests.exceptions.HTTPError),
         ):
             response = test_client.get(url=f"/download/{file_id}")
@@ -99,7 +99,7 @@ class TestDownloadFailure:
         fake_file_info = FileInformationFactory.create(file_id=file_id, location=file)
 
         with patch(
-            "app.services.file_service.get_file_info",
+            "app.services.metadata_service.get_file_info",
             MagicMock(side_effect=requests.exceptions.RequestException),
         ):
             response = test_client.get(url=f"/download/{file_id}")
@@ -115,7 +115,7 @@ class TestDownloadFailure:
         fake_file_info = FileInformationFactory.create(file_id=file_id, location=file)
 
         with patch(
-            "app.services.file_service.get_file_info",
+            "app.services.metadata_service.get_file_info",
             MagicMock(side_effect=json.JSONDecodeError("", "", 0)),
         ):
             response = test_client.get(url=f"/download/{file_id}")
@@ -131,7 +131,7 @@ class TestDownloadFailure:
         fake_file_info = FileInformationFactory.create(file_id=file_id, location=file)
 
         with patch(
-            "app.services.file_service.get_file_info",
+            "app.services.metadata_service.get_file_info",
             MagicMock(side_effect=UnicodeDecodeError("utf-8", b"", 0, 1, "pytest")),
         ):
             response = test_client.get(url=f"/download/{file_id}")
@@ -148,7 +148,7 @@ class TestDownloadFailure:
         fake_file_info = FileInformationFactory.create(file_id=file_id, location=file)
 
         with patch(
-            "app.services.file_service.get_file_info",
+            "app.services.metadata_service.get_file_info",
             MagicMock(side_effect=Exception),
         ):
             response = test_client.get(url=f"/download/{file_id}")

@@ -21,10 +21,11 @@ class TestDeleteSuccess:
         fake_file_id = "259744af-8583-438e-b4ef-045e7f656a4b"
         fake_file_info = FileInformationFactory.create(file_id=fake_file_id)
         
-        with patch("app.services.file_service.get_file_info", MagicMock(return_value=fake_file_info)):
-            response = test_client.delete(
-                url=f"/delete/{fake_file_id}"
-            )
+        with patch("app.services.metadata_service.get_file_info", MagicMock(return_value=fake_file_info)):
+            with patch("app.services.metadata_service.delete_metadata", MagicMock(return_value=fake_file_info)):
+                response = test_client.delete(
+                    url=f"/delete/{fake_file_id}"
+                )
         assert response.status_code == 200
         assert response.content.decode("utf-8") == "File Successfully Deleted"
         
@@ -35,11 +36,12 @@ class TestDeleteFailure:
         fake_file_id = "259744af-8583-438e-b4ef-045e7f656a4b"
         fake_file_info = FileInformationFactory.create(file_id=fake_file_id)
         
-        with patch("app.services.file_service.get_file_info", MagicMock(return_value=fake_file_info)):
+        with patch("app.services.metadata_service.get_file_info", MagicMock(return_value=fake_file_info)):
             with patch("app.services.file_service.delete_file", MagicMock(return_value=False)):
-                response = test_client.delete(
-                    url=f"/delete/{fake_file_id}"
-                )
+                with patch("app.services.metadata_service.delete_metadata", MagicMock(return_value=fake_file_info)):
+                    response = test_client.delete(
+                        url=f"/delete/{fake_file_id}"
+                    )
         content = json.loads(response.content.decode("utf-8"))
         assert response.status_code == 500
         assert content == {"detail":{"message":"Delete File Request Failed"}}
@@ -49,7 +51,7 @@ class TestDeleteFailure:
         test_client: TestClient = setup_test_client
         fake_file_id = "259744af-8583-438e-b4ef-045e7f656a4b"
         
-        with patch("app.services.file_service.get_file_info", MagicMock(side_effect=requests.exceptions.ConnectionError)):
+        with patch("app.services.metadata_service.get_file_info", MagicMock(side_effect=requests.exceptions.ConnectionError)):
             response = test_client.delete(
                 url=f"/delete/{fake_file_id}"
             )
@@ -61,7 +63,7 @@ class TestDeleteFailure:
         test_client: TestClient = setup_test_client
         fake_file_id = "259744af-8583-438e-b4ef-045e7f656a4b"
         
-        with patch("app.services.file_service.get_file_info", MagicMock(side_effect=requests.exceptions.Timeout)):
+        with patch("app.services.metadata_service.get_file_info", MagicMock(side_effect=requests.exceptions.Timeout)):
             response = test_client.delete(
                 url=f"/delete/{fake_file_id}"
             )
@@ -73,7 +75,7 @@ class TestDeleteFailure:
         test_client: TestClient = setup_test_client
         fake_file_id = "259744af-8583-438e-b4ef-045e7f656a4b"
         
-        with patch("app.services.file_service.get_file_info", MagicMock(side_effect=requests.exceptions.HTTPError)):
+        with patch("app.services.metadata_service.get_file_info", MagicMock(side_effect=requests.exceptions.HTTPError)):
             response = test_client.delete(
                 url=f"/delete/{fake_file_id}"
             )
@@ -85,7 +87,7 @@ class TestDeleteFailure:
         test_client: TestClient = setup_test_client
         fake_file_id = "259744af-8583-438e-b4ef-045e7f656a4b"
         
-        with patch("app.services.file_service.get_file_info", MagicMock(side_effect=requests.exceptions.RequestException)):
+        with patch("app.services.metadata_service.get_file_info", MagicMock(side_effect=requests.exceptions.RequestException)):
             response = test_client.delete(
                 url=f"/delete/{fake_file_id}"
             )
@@ -97,7 +99,7 @@ class TestDeleteFailure:
         test_client: TestClient = setup_test_client
         fake_file_id = "259744af-8583-438e-b4ef-045e7f656a4b"
         
-        with patch("app.services.file_service.get_file_info", MagicMock(side_effect=json.JSONDecodeError("", "", 0))):
+        with patch("app.services.metadata_service.get_file_info", MagicMock(side_effect=json.JSONDecodeError("", "", 0))):
             response = test_client.delete(
                 url=f"/delete/{fake_file_id}"
             )
@@ -109,7 +111,7 @@ class TestDeleteFailure:
         test_client: TestClient = setup_test_client
         fake_file_id = "259744af-8583-438e-b4ef-045e7f656a4b"
         
-        with patch("app.services.file_service.get_file_info", MagicMock(side_effect=UnicodeDecodeError("utf-8", b"", 0, 1, "pytest"))):
+        with patch("app.services.metadata_service.get_file_info", MagicMock(side_effect=UnicodeDecodeError("utf-8", b"", 0, 1, "pytest"))):
             response = test_client.delete(
                 url=f"/delete/{fake_file_id}"
             )
@@ -121,7 +123,7 @@ class TestDeleteFailure:
         test_client: TestClient = setup_test_client
         fake_file_id = "259744af-8583-438e-b4ef-045e7f656a4b"
         
-        with patch("app.services.file_service.get_file_info", MagicMock(side_effect=Exception)):
+        with patch("app.services.metadata_service.get_file_info", MagicMock(side_effect=Exception)):
             response = test_client.delete(
                 url=f"/delete/{fake_file_id}"
             )

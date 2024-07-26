@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, HTTPException, Response
 from fastapi.responses import FileResponse
 from uuid import UUID
 import os 
-from app.services import file_service, connection_service
+from app.services import file_service, connection_service, metadata_service
 from app.schemas.schemas import FileInformation, CommonEventFormat, ConnectionInformation
 import requests
 import json
@@ -31,7 +31,7 @@ async def download_file(request: Request, file_id: UUID):
     log.file_id = file_id
     
     try:
-        file_info: FileInformation = file_service.get_file_info(file_id=file_id)
+        file_info: FileInformation = metadata_service.get_file_info(file_id=file_id)
     except requests.exceptions.ConnectionError as error :
         logging.error(f"Connection Error to Metadata Storage {error}")
         log.event = "Download File Request Failed"
@@ -118,14 +118,15 @@ def delete(request: Request, file_id: UUID):
     log.file_id = file_id
     
     try:
-        file_info: FileInformation = file_service.get_file_info(file_id=file_id)
+        file_info: FileInformation = metadata_service.get_file_info(file_id=file_id)
+        metadata_service.delete_metadata(file_id=file_id)
         deleted = file_service.delete_file(file_info=file_info)
     except requests.exceptions.ConnectionError as error :
         logging.error(f"Connection Error to Metadata Storage {error}")
         log.event = "Delete File Request Failed"
         log.severity = 10
         log.log_id = "L0031"
-        log.extension["message"] = "Get metadata connection failed"
+        log.extension["message"] = "Delete metadata connection failed"
         log.log()
         raise HTTPException(500, detail={"message": "Delete File Request Failed"})
     except requests.exceptions.Timeout as error:
@@ -133,7 +134,7 @@ def delete(request: Request, file_id: UUID):
         log.event = "Delete File Request Failed"
         log.severity = 10
         log.log_id = "L0031"
-        log.extension["message"] = "Get metadata connection timeout"
+        log.extension["message"] = "Delete metadata connection timeout"
         log.log()
         raise HTTPException(500, detail={"message": "Delete File Request Failed"})
     except requests.exceptions.HTTPError as error:
@@ -141,7 +142,7 @@ def delete(request: Request, file_id: UUID):
         log.event = "Delete File Request Failed"
         log.severity = 10
         log.log_id = "L0031"
-        log.extension["message"] = "Get metadata connection failed"
+        log.extension["message"] = "Delete metadata connection failed"
         log.log()
         raise HTTPException(500, detail={"message": "Delete File Request Failed"})
     except requests.exceptions.RequestException as error:
@@ -149,7 +150,7 @@ def delete(request: Request, file_id: UUID):
         log.event = "Delete File Request Failed"
         log.severity = 10
         log.log_id = "L0031"
-        log.extension["message"] = "Get metadata request failed"
+        log.extension["message"] = "Delete metadata request failed"
         log.log()
         raise HTTPException(500, detail={"message": "Delete File Request Failed"})
     except json.JSONDecodeError as error:
@@ -157,7 +158,7 @@ def delete(request: Request, file_id: UUID):
         log.event = "Delete File Request Failed"
         log.severity = 10
         log.log_id = "L0031"
-        log.extension["message"] = "Get metadata request failed"
+        log.extension["message"] = "Delete metadata request failed"
         log.log()
         raise HTTPException(500, detail={"message": "Delete File Request Failed"})
     except UnicodeDecodeError as error:
@@ -165,15 +166,15 @@ def delete(request: Request, file_id: UUID):
         log.event = "Delete File Request Failed"
         log.severity = 10
         log.log_id = "L0031"
-        log.extension["message"] = "Get metadata request failed"
+        log.extension["message"] = "Delete metadata request failed"
         log.log()
         raise HTTPException(500, detail={"message": "Delete File Request Failed"})
     except Exception as error:
-        logging.error(f"Unhandled Exception for get metadata {error}")
+        logging.error(f"Unhandled Exception for delete metadata {error}")
         log.event = "Delete File Request Failed"
         log.severity = 10
         log.log_id = "L0031"
-        log.extension["message"] = "Get metadata request failed"
+        log.extension["message"] = "Delete metadata request failed"
         log.log()
         raise HTTPException(500, detail={"message": "Delete File Request Failed"})
     
