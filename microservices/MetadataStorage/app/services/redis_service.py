@@ -39,3 +39,13 @@ async def get_metadata(file_id: UUID, redis_connection: redis.Redis):
         logging.error(f"Malformed dict for FileInformation schema type - error - {error} - dict - {metadata}")
         raise 
     return file_info
+
+async def delete_metadata(file_id: UUID, redis_connection: redis.Redis):
+    data_keys = await redis_connection.hkeys(name=f"FileData{file_id}")
+    response = await redis_connection.hdel(f"FileData{file_id}", *data_keys)
+    if response < 1:
+        exists = await redis_connection.exists(f"FileData{file_id}")
+        if exists:
+            return False
+
+    return True

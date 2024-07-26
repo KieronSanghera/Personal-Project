@@ -5,6 +5,7 @@ from unittest.mock import patch, MagicMock, AsyncMock
 import pytest
 import redis
 from pydantic import ValidationError
+from uuid import uuid4
 
 
 class TestRedisServiceSuccess:
@@ -34,6 +35,22 @@ class TestRedisServiceSuccess:
             response = await redis_service.get_metadata(file_info.file_id, redis_connection=redis.asyncio.Redis)
         
         response == file_info
+
+    @pytest.mark.asyncio
+    @patch.object(redis.asyncio.Redis, "hdel", AsyncMock(return_value=1))
+    @patch.object(redis.asyncio.Redis, "hkeys", AsyncMock(return_value="2"))
+    async def test_delete_metadata(self):
+        response = await redis_service.delete_metadata(file_id=uuid4(), redis_connection=redis.asyncio.Redis)
+        assert response is True
+        
+    @pytest.mark.asyncio
+    @patch.object(redis.asyncio.Redis, "hdel", AsyncMock(return_value=0))
+    @patch.object(redis.asyncio.Redis, "hkeys", AsyncMock(return_value="2"))
+    @patch.object(redis.asyncio.Redis, "exists", AsyncMock(return_value=False))
+    async def test_delete_metadata_not_exists(self):
+        response = await redis_service.delete_metadata(file_id=uuid4(), redis_connection=redis.asyncio.Redis)
+        assert response is True
+    
         
 class TestRedisServiceFailure:
     
@@ -63,5 +80,11 @@ class TestRedisServiceFailure:
                 with patch("app.services.redis_service.json.loads", MagicMock(return_value={})):
                     response = await redis_service.get_metadata(file_info.file_id, redis_connection=redis.asyncio.Redis)
         
-            
+    @pytest.mark.asyncio
+    @patch.object(redis.asyncio.Redis, "hdel", AsyncMock(return_value=0))
+    @patch.object(redis.asyncio.Redis, "hkeys", AsyncMock(return_value="2"))
+    @patch.object(redis.asyncio.Redis, "exists", AsyncMock(return_value=True))
+    async def test_delete_metadata_exits(self):
+        response = await redis_service.delete_metadata(file_id=uuid4(), redis_connection=redis.asyncio.Redis)
+        assert response is False
         

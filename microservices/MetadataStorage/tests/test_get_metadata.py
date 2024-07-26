@@ -37,7 +37,7 @@ class TestGetMetadataSuccess:
         metadata = contents["metadata"]
 
         assert response.status_code == 200
-        assert contents["message"] == "Get Metadata"
+        assert contents["message"] == "Got Metadata"
         assert metadata == redis_metadata.model_dump_database()
 
 

@@ -95,7 +95,6 @@ async def new_metadata(
     log.extension["message"] = "File Metadata was successfully stored"
     log.log()
 
-
     return {
         "message": "Metadata Stored",
         "storage_info": f"FileData{file_data.file_id}",
@@ -176,7 +175,80 @@ async def get_file_metadata(
     log.log()
 
     response = Response(
-        message="Get Metadata", metadata=metadata, connection_info=connection_info
+        message="Got Metadata", metadata=metadata, connection_info=connection_info
     )
 
     return response
+
+
+@router.delete("/deleteMetadata/{file_id}")
+async def delete_file_metadata(
+    request: Request,
+    file_id: UUID,
+    redis_connection: redis.Redis = Depends(dependency.get_redis),
+):
+    log: CommonEventFormat = CommonEventFormat(version="0.1.0")
+    connection_info: ConnectionInformation = connection_service.connection_info(
+        request=request
+    )
+
+    log.connection_id = connection_info.connection_id
+    log.extension["src"] = connection_info.source_addr
+    log.extension["host"] = connection_info.host_addr
+
+    log.file_id = file_id
+
+    try:
+        metadata_deleted = await redis_service.delete_metadata(file_id=file_id, redis_connection=redis_connection)
+    except (
+        redis_exception.ConnectionError,
+        redis_exception.TimeoutError,
+        redis_exception.AuthenticationError,
+        redis_exception.ResponseError,
+        redis_exception.DataError,
+        redis_exception.InvalidResponse,
+    ) as error:
+        logging.error(f"Connection Error to redis {error}")
+        log.event = "Delete Metadata Storage Request Failed"
+        log.severity = 10
+        log.log_id = "L0026"
+        log.extension["message"] = "Delete metadata storage request failed"
+        log.log()
+        raise HTTPException(500, detail={"message": "Redis Error"})
+    except asyncio.CancelledError as error:
+        logging.error(f"Asyncio error {error}")
+        log.event = "Delete Metadata Storage Request Failed"
+        log.severity = 10
+        log.log_id = "L0026"
+        log.extension["message"] = "Delete metadata storage request failed"
+        log.log()
+        raise HTTPException(500, detail={"message": "Asyncio Error"})
+    except Exception as error:
+        logging.error(f"Unhandled Error raised {error}")
+        log.event = "Delete Metadata Storage Request Failed"
+        log.severity = 10
+        log.log_id = "L0026"
+        log.extension["message"] = "Delete metadata storage request failed"
+        log.log()
+        raise HTTPException(500, detail={"message": "Internal Error"})
+
+    if not metadata_deleted:
+        logging.info(f"Metadata NOT Deleted")
+        log.event = "Delete Metadata Storage Request Failed"
+        log.severity = 10
+        log.log_id = "L0021"
+        log.extension["message"] = "New metadata storage request failed"
+        log.log()
+        raise HTTPException(500, detail={"message": "Metadata NOT Stored"})
+
+    
+    logging.info("Delete file metadata request was successful")
+    log.event = "Delete Metadata Request Successful"
+    log.severity = 1
+    log.log_id = "L0025"
+    log.extension["message"] = "Delete metadata was successful"
+    log.log()
+
+    return {
+        "message": "Metadata Deleted"
+        }
