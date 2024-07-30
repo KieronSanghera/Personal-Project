@@ -33,6 +33,6 @@
 
  This stores the metadata for the file in a redis database.
 
-### File Release
+### File Management
 
  This allows for the file to be downloaded or deleted
