@@ -9,11 +9,11 @@ sleep 3
 minikube image rm file_gateway
 minikube image rm file_storage
 minikube image rm metadata_storage
-minikube image rm file_release
+minikube image rm file_management
 
 minikube image load file_gateway:latest
 minikube image load file_storage:latest
 minikube image load metadata_storage:latest
-minikube image load file_release:latest
+minikube image load file_management:latest
 
 kubectl scale deployments --replicas=1 --all

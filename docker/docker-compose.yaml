@@ -17,8 +17,8 @@ services:
       dockerfile: ./docker/Dockerfile
     image: metadata_storage
 
-  file_release:
+  file_management:
     build:
-      context: ../microservices/FileRelease
+      context: ../microservices/FileManagement
       dockerfile: ./docker/Dockerfile
-    image: file_release
+    image: file_management

@@ -7,7 +7,7 @@ replicaCount: 1
 namespace: project
 
 image:
-  repository: "file_release"
+  repository: "file_management"
   tag: "latest"
   pullPolicy: Never
 

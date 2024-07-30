@@ -14,7 +14,7 @@ releases:
     values:
       - ../microservices/MetadataStorage/helm/values.yaml
   
-  - name: file-release
-    chart: ../microservices/FileRelease/helm
+  - name: file-management
+    chart: ../microservices/FileManagement/helm
     values:
-      - ../microservices/FileRelease/helm/values.yaml
+      - ../microservices/FileManagement/helm/values.yaml
