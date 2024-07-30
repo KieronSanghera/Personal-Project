@@ -28,3 +28,11 @@
 ### File Storage
 
  This is stores the file.
+
+### Metadata Storage
+
+ This stores the metadata for the file in a redis database.
+
+### File Release
+
+ This allows for the file to be downloaded or deleted
