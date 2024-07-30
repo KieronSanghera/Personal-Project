@@ -1,0 +1,20 @@
+releases:
+  - name: file-gateway
+    chart: ../microservices/FileGateway/helm
+    values:
+      - ../microservices/FileGateway/helm/values.yaml
+
+  - name: file-storage
+    chart: ../microservices/FileStorage/helm
+    values:
+      - ../microservices/FileStorage/helm/values.yaml
+
+  - name: metadata-storage
+    chart: ../microservices/MetadataStorage/helm
+    values:
+      - ../microservices/MetadataStorage/helm/values.yaml
+  
+  - name: file-release
+    chart: ../microservices/FileRelease/helm
+    values:
+      - ../microservices/FileRelease/helm/values.yaml

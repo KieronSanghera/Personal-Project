@@ -1,0 +1,24 @@
+services:
+  file_gateway:
+    build:
+      context: ../microservices/FileGateway
+      dockerfile: ./docker/Dockerfile
+    image: file_gateway
+
+  file_storage:
+    build:
+      context: ../microservices/FileStorage
+      dockerfile: ./docker/Dockerfile
+    image: file_storage
+
+  metadata_storage:
+    build:
+      context: ../microservices/MetadataStorage
+      dockerfile: ./docker/Dockerfile
+    image: metadata_storage
+
+  file_release:
+    build:
+      context: ../microservices/FileRelease
+      dockerfile: ./docker/Dockerfile
+    image: file_release
